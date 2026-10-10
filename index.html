@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f4f1">
+    <meta name="description" content="Build color palettes, compare WCAG contrast, and export CSS tokens locally.">
+    <title>HueDock — Color workspace</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#top" aria-label="HueDock home"><span class="brand-mark">H</span><span>huedock<span class="brand-dot">.</span></span></a>
+        <nav class="nav-links" aria-label="Main navigation"><a href="#studio">Studio</a><a href="#contrast">Contrast</a><a href="#library">Library</a></nav>
+        <div class="top-actions"><span class="local-pill"><i></i> LOCAL WORKSPACE</span><button class="theme-button" id="theme-toggle" type="button" aria-label="Toggle color theme">◐</button></div>
+      </header>
+
+      <main id="top">
+        <section class="hero">
+          <div class="hero-copy"><p class="eyebrow"><span class="eyebrow-dot"></span> COLOR WORKSPACE · 01</p><h1>Find your<br><em>color rhythm.</em></h1><p class="hero-text">Build balanced palettes, check readable contrast, and take the tokens straight to your interface.</p><a class="scroll-link" href="#studio">Open the studio <span>↓</span></a></div>
+          <div class="hero-art" aria-hidden="true"><div class="orb orb-a"></div><div class="orb orb-b"></div><div class="orb orb-c"></div><div class="art-caption"><span>HUE / 214°</span><span>SAT / 74%</span><span>LUM / 52%</span></div></div>
+          <div class="hero-index">A TOOL FOR<br>BETTER COLOR<br><span>DESIGNED TO STAY LOCAL</span></div>
+        </section>
+
+        <section class="studio section" id="studio">
+          <div class="section-title"><div><p class="eyebrow">01 / GENERATE</p><h2>Palette studio</h2></div><p class="section-note">Start with one color.<br>Explore four ways forward.</p></div>
+          <div class="studio-bar panel">
+            <div class="color-input-group"><span class="field-label">BASE COLOR</span><label class="color-chip"><input id="base-picker" type="color" value="#5d70d6" aria-label="Choose base color"><span class="color-swatch" id="picker-preview"></span></label><input id="base-hex" class="hex-input" type="text" value="#5D70D6" maxlength="7" spellcheck="false" aria-label="Base HEX color"><button id="randomize" class="quiet-button" type="button" title="Generate a random base color" aria-label="Generate random color">↻</button></div>
+            <label class="harmony-select"><span class="field-label">HARMONY</span><select id="harmony"><option value="analogous">Analogous</option><option value="complementary">Complementary</option><option value="triadic">Triadic</option><option value="tetradic">Tetradic</option></select></label>
+            <button id="save-palette" class="button-primary" type="button"><span>＋</span> Save palette</button>
+          </div>
+          <p id="studio-message" class="message" role="status" aria-live="polite"></p>
+          <div class="palette-grid" id="palette-grid" aria-label="Generated palette swatches"></div>
+          <div class="palette-footer"><span><b id="swatch-count">05</b> COLORS · SELECT A SWATCH TO COPY</span><button id="copy-css" class="text-button" type="button">Copy CSS tokens <span>↗</span></button></div>
+        </section>
+
+        <section class="contrast-section section" id="contrast">
+          <div class="section-title"><div><p class="eyebrow">02 / CHECK</p><h2>Contrast, made clear</h2></div><p class="section-note">WCAG 2.x contrast ratio<br>for text and UI colors.</p></div>
+          <div class="contrast-panel panel">
+            <div class="contrast-controls">
+              <label class="contrast-field"><span class="field-label">TEXT COLOR</span><div class="contrast-input"><input id="foreground-picker" type="color" value="#ffffff" aria-label="Choose text color"><input id="foreground-hex" type="text" value="#FFFFFF" maxlength="7" spellcheck="false" aria-label="Text HEX color"></div></label>
+              <span class="versus">ON</span>
+              <label class="contrast-field"><span class="field-label">BACKGROUND</span><div class="contrast-input"><input id="background-picker" type="color" value="#3349a6" aria-label="Choose background color"><input id="background-hex" type="text" value="#3349A6" maxlength="7" spellcheck="false" aria-label="Background HEX color"></div></label>
+            </div>
+            <div class="contrast-result" id="contrast-preview"><div class="preview-sample"><span class="sample-label">Aa</span><div><strong>Readable by design.</strong><span>Good color is clear at every size.</span></div><span class="sample-tag">TEXT PREVIEW</span></div><div class="ratio-block"><span class="field-label">CONTRAST RATIO</span><strong id="contrast-ratio">—</strong><div id="contrast-grade" class="grade-list"></div></div></div>
+            <p class="contrast-footnote">Contrast results follow WCAG 2.x thresholds. They are a practical check, not a full accessibility audit.</p>
+          </div>
+        </section>
+
+        <section class="library-section section" id="library">
+          <div class="section-title"><div><p class="eyebrow">03 / KEEP</p><h2>Your palette shelf</h2></div><div class="library-actions"><button id="export-library" class="text-button" type="button">Export JSON <span>↓</span></button><button id="import-library-button" class="text-button" type="button">Import <span>↑</span></button><input id="import-library" class="sr-only" type="file" accept="application/json,.json"></div></div>
+          <div class="saved-grid" id="saved-grid"></div>
+          <div class="saved-empty" id="saved-empty"><span class="empty-orbit">✳</span><strong>Your shelf is clear.</strong><span>Save a palette to keep it nearby on this device.</span></div>
+        </section>
+      </main>
+
+      <footer class="footer"><a class="brand" href="#top"><span class="brand-mark small">H</span><span>huedock<span class="brand-dot">.</span></span></a><span>COLOR TOOLS, KEPT ON YOUR DEVICE.</span><a href="https://github.com/GhosTnever-lkm/huedock">OPEN SOURCE ↗</a></footer>
+    </div>
+    <script type="module" src="app.mjs"></script>
+  </body>
+</html>
