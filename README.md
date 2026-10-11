@@ -2,6 +2,8 @@
 
 **HueDock** is a local-first color workspace for building palettes, checking text contrast against WCAG 2.x thresholds, and exporting CSS custom properties.
 
+![HueDock: color palette workspace with WCAG contrast checks](docs/screenshot.png)
+
 ## Features
 
 - Four five-color harmony sets: analogous, complementary, triadic, and tetradic.
