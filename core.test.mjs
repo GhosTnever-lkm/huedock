@@ -51,3 +51,10 @@ test('sanitizes CSS variable names and exports only valid color values', () => {
   assert.throws(() => exportCss({ '!!!': '#fff' }));
   assert.throws(() => exportCss({ accent: 'url(javascript:alert(1))' }));
 });
+
+test('keeps CSS variables unique when distinct labels sanitize to the same name', () => {
+  assert.equal(
+    exportCss({ 'Brand / Primary': '#f00', 'brand-primary': '#00f', 'brand-primary-2': '#0f0', 'brand primary': '#fff' }),
+    ':root {\n  --brand-primary: #ff0000;\n  --brand-primary-2: #0000ff;\n  --brand-primary-2-2: #00ff00;\n  --brand-primary-3: #ffffff;\n}',
+  );
+});

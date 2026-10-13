@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2 — 2026-10-13
+
+- Keep exported CSS custom property names unique when different palette labels normalize to the same identifier.
+
 ## 0.1.1 - 2026-10-11
 
 - Add a real screenshot of the app to the README.
