@@ -110,6 +110,14 @@ export function exportCss(variables) {
   if (!variables || typeof variables !== 'object' || Array.isArray(variables)) throw new Error('Expected a variable map.');
   const entries = Object.entries(variables);
   if (!entries.length || entries.length > 100) throw new Error('Provide between 1 and 100 color variables.');
-  const lines = entries.map(([name, value]) => `  ${safeVarName(name)}: ${parseHex(value).hex};`);
+  const usedNames = new Set();
+  const lines = entries.map(([name, value]) => {
+    const baseName = safeVarName(name);
+    let variableName = baseName;
+    let suffix = 2;
+    while (usedNames.has(variableName)) variableName = `${baseName}-${suffix++}`;
+    usedNames.add(variableName);
+    return `  ${variableName}: ${parseHex(value).hex};`;
+  });
   return `:root {\n${lines.join('\n')}\n}`;
 }
