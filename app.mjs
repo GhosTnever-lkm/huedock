@@ -1,4 +1,4 @@
-import { contrastRatio, exportCss, harmonies, parseHex, recommendedText, wcag } from './core.mjs';
+import { addSavedPalette, contrastRatio, exportCss, harmonies, mergeSavedPalettes, parseHex, recommendedText, wcag } from './core.mjs';
 
 const $ = (id) => document.getElementById(id);
 const storeKey = 'huedock.palette-shelf.v1';
@@ -126,18 +126,20 @@ function renderShelf() {
 }
 
 function button(label, onClick) { const node = document.createElement('button'); node.type = 'button'; node.className = 'small-action'; node.textContent = label; node.addEventListener('click', onClick); return node; }
-function persistShelf() { localStorage.setItem(storeKey, JSON.stringify(saved)); renderShelf(); }
-function removeSaved(id) { saved = saved.filter((item) => item.id !== id); persistShelf(); announce('Palette removed from your shelf.'); }
+function persistShelf(nextSaved = saved) { localStorage.setItem(storeKey, JSON.stringify(nextSaved)); saved = nextSaved; renderShelf(); }
+function removeSaved(id) {
+  try { persistShelf(saved.filter((item) => item.id !== id)); announce('Palette removed from your shelf.'); }
+  catch { announce('Could not update browser storage. Your saved palettes remain unchanged.', true); }
+}
 
 function savePalette() {
   const name = prompt('Name this palette', `${paletteNames[$('harmony').value]} ${new Date().toLocaleDateString()}`);
   if (name === null) return;
   const cleanName = name.trim().slice(0, 50);
   if (!cleanName) { announce('Enter a palette name first.', true); return; }
-  saved.unshift({ id: crypto.randomUUID(), name: cleanName, harmony: $('harmony').value, colors: activePalette, base: activeBase, createdAt: new Date().toISOString() });
-  saved = saved.slice(0, 36);
-  try { persistShelf(); announce(`Saved “${cleanName}” on this device.`); }
-  catch { saved.shift(); announce('Browser storage is full. Export or remove older palettes.', true); }
+  const palette = { id: crypto.randomUUID(), name: cleanName, harmony: $('harmony').value, colors: activePalette, base: activeBase, createdAt: new Date().toISOString() };
+  try { persistShelf(addSavedPalette(saved, palette)); announce(`Saved “${cleanName}” on this device.`); }
+  catch (error) { announce(error.message || 'Browser storage is unavailable or full. Export or remove older palettes.', true); }
 }
 
 async function copyText(text, success) {
@@ -166,7 +168,7 @@ async function importLibrary(file) {
       if (typeof item.name !== 'string' || !item.name.trim() || !Array.isArray(item.colors) || item.colors.length !== 5 || !Object.hasOwn(paletteNames, item.harmony)) throw new Error('A saved palette is malformed.');
       return { id: crypto.randomUUID(), name: item.name.trim().slice(0, 50), harmony: item.harmony, colors: item.colors.map((color) => parseHex(color).hex), base: parseHex(item.base || item.colors[2]).hex, createdAt: new Date().toISOString() };
     });
-    saved = [...incoming, ...saved].slice(0, 36); persistShelf(); announce(`Imported ${incoming.length} palette(s).`);
+    persistShelf(mergeSavedPalettes(saved, incoming)); announce(`Imported ${incoming.length} palette(s).`);
   } catch (error) { announce(error.message || 'Could not import this backup.', true); }
   finally { $('import-library').value = ''; }
 }
@@ -184,7 +186,9 @@ for (const [picker, input] of [['foreground-picker', 'foreground-hex'], ['backgr
 $('export-library').addEventListener('click', exportLibrary);
 $('import-library-button').addEventListener('click', () => $('import-library').click());
 $('import-library').addEventListener('change', () => importLibrary($('import-library').files?.[0]));
-$('theme-toggle').addEventListener('click', () => { const dark = document.documentElement.dataset.theme !== 'dark'; document.documentElement.dataset.theme = dark ? 'dark' : 'light'; localStorage.setItem('huedock.theme', dark ? 'dark' : 'light'); });
+$('theme-toggle').addEventListener('click', () => { const dark = document.documentElement.dataset.theme !== 'dark'; document.documentElement.dataset.theme = dark ? 'dark' : 'light'; saveTheme(dark ? 'dark' : 'light'); });
 document.addEventListener('keydown', (event) => { if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); $('base-hex').focus(); $('base-hex').select(); } });
-document.documentElement.dataset.theme = localStorage.getItem('huedock.theme') || 'light';
+function readTheme() { try { return localStorage.getItem('huedock.theme') || 'light'; } catch { return 'light'; } }
+function saveTheme(theme) { try { localStorage.setItem('huedock.theme', theme); } catch { /* Keep the selected theme for this session if storage is unavailable. */ } }
+document.documentElement.dataset.theme = readTheme();
 renderPalette(); renderShelf();

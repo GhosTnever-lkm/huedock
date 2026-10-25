@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { contrastRatio, exportCss, harmonies, hslToRgb, parseHex, recommendedText, relativeLuminance, rgbToHex, rgbToHsl, safeVarName, wcag } from './core.mjs';
+import { addSavedPalette, contrastRatio, exportCss, harmonies, hslToRgb, mergeSavedPalettes, parseHex, recommendedText, relativeLuminance, rgbToHex, rgbToHsl, safeVarName, wcag } from './core.mjs';
 
 test('parses and canonicalizes short and long HEX', () => {
   assert.deepEqual(parseHex('#abc'), { hex: '#aabbcc', r: 170, g: 187, b: 204 });
@@ -57,4 +57,20 @@ test('keeps CSS variables unique when distinct labels sanitize to the same name'
     exportCss({ 'Brand / Primary': '#f00', 'brand-primary': '#00f', 'brand-primary-2': '#0f0', 'brand primary': '#fff' }),
     ':root {\n  --brand-primary: #ff0000;\n  --brand-primary-2: #0000ff;\n  --brand-primary-2-2: #00ff00;\n  --brand-primary-3: #ffffff;\n}',
   );
+});
+
+test('refuses saving past the shelf limit without dropping existing palettes', () => {
+  const existing = Array.from({ length: 36 }, (_, index) => ({ id: String(index) }));
+  assert.throws(() => addSavedPalette(existing, { id: 'new' }), /shelf is full/);
+  assert.equal(existing.length, 36);
+  assert.equal(existing[0].id, '0');
+});
+
+test('rejects imports that would crowd out saved palettes', () => {
+  const existing = Array.from({ length: 30 }, (_, index) => ({ id: `saved-${index}` }));
+  const incoming = Array.from({ length: 7 }, (_, index) => ({ id: `imported-${index}` }));
+  assert.throws(() => mergeSavedPalettes(existing, incoming), /exceed the 36-palette shelf limit/);
+  assert.equal(existing.length, 30);
+  assert.equal(incoming.length, 7);
+  assert.equal(mergeSavedPalettes(existing, incoming.slice(0, 6)).length, 36);
 });

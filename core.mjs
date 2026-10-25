@@ -1,4 +1,5 @@
 const HEX = /^#(?:[\da-f]{3}|[\da-f]{6})$/i;
+const MAX_SAVED_PALETTES = 36;
 const HARMONIES = Object.freeze({
   analogous: [-30, -15, 0, 15, 30],
   complementary: [0, 150, 180, 210, 330],
@@ -120,4 +121,16 @@ export function exportCss(variables) {
     return `  ${variableName}: ${parseHex(value).hex};`;
   });
   return `:root {\n${lines.join('\n')}\n}`;
+}
+
+export function addSavedPalette(existing, palette) {
+  if (!Array.isArray(existing)) throw new Error('Expected a saved palette list.');
+  if (existing.length >= MAX_SAVED_PALETTES) throw new Error(`Palette shelf is full (${MAX_SAVED_PALETTES}). Export a backup or remove a palette before saving another.`);
+  return [palette, ...existing];
+}
+
+export function mergeSavedPalettes(existing, incoming) {
+  if (!Array.isArray(existing) || !Array.isArray(incoming)) throw new Error('Expected saved palette lists.');
+  if (existing.length + incoming.length > MAX_SAVED_PALETTES) throw new Error(`Import would exceed the ${MAX_SAVED_PALETTES}-palette shelf limit. Export or remove palettes, then try again.`);
+  return [...incoming, ...existing];
 }

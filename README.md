@@ -10,7 +10,7 @@
 - HEX and native color-picker inputs, plus a cryptographically randomized color button.
 - Text/background contrast ratio with AA and AAA checks for normal and large text.
 - Black/white text recommendation and a live contrast preview.
-- Save palettes in browser storage; import and export a portable JSON backup.
+- Save up to 36 palettes in browser storage; imports that exceed the shelf limit are rejected without replacing saved palettes. Export and import portable JSON backups.
 - Copy swatches and CSS tokens, keyboard shortcut `Ctrl/⌘ + K`, and dark/light themes.
 - No account, analytics, remote fonts, dependencies, or network calls. Saved palettes stay in this browser profile unless exported.
 
